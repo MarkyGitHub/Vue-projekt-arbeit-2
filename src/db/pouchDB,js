@@ -1,0 +1,19 @@
+import { PouchDB } from "pouchdb";
+const db = new PouchDB("local_db");
+
+async function syncWithCouchDB() {
+  const remoteDb = "http://127.0.0.1:5984/example_db";
+  try {
+    const sync = db.sync(remoteDb, {
+      live: true,
+      retry: true,
+    });
+    console.log("Syncing with CouchDB...");
+    sync.on("complete", () => console.log("Sync complete!"));
+    sync.on("error", (err) => console.error("Sync error:", err));
+  } catch (error) {
+    console.error("Error syncing:", error);
+  }
+}
+
+syncWithCouchDB();

@@ -1,30 +1,46 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <HeaderMenu />
+    <main>
+      <router-view />
+      <!-- Displays the active view -->
+    </main>
+    <Footer />
+  </div>
+  <div>
+    <HeaderMenu />
+    <DetailComponent />
+    <AppFooter />
+    <MainIndex />
+  </div>
 </template>
 
+<script>
+import DetailComponent from "@/components/DetailComponent.vue";
+import AppFooter from "@/components/AppFooter.vue";
+import MainIndex from "@/components/MainIndex.vue";
+import HeaderMenu from "@/components/HeaderMenu.vue";
+
+export default {
+  components: {
+    HeaderMenu,
+    DetailComponent,
+    AppFooter,
+    MainIndex,
+  },
+};
+</script>
+
 <style>
+/* Global styles for layout */
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+main {
+  flex: 1; /* Fills available space between header and footer */
+  padding: 20px;
 }
 </style>

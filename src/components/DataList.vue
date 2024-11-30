@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Data Items</h1>
+    <h2>Data List</h2>
     <ul>
       <li v-for="item in dataItems" :key="item._id">
         <h3>{{ item.title }}</h3>
@@ -14,7 +14,7 @@
 export default {
   computed: {
     dataItems() {
-      // Access data items from Vuex
+      // Access Vuex state using a getter
       return this.$store.getters.dataItems;
     },
   },
