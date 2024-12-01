@@ -1,6 +1,7 @@
 <template>
   <div id="data-cards-container" class="data-grid">
-    <DataItemCard v-for="item in dataItems" :key="item.id" :item="item" />
+    <!-- Add click event to each card -->
+    <DataItemCard v-for="item in dataItems" :key="item.id" :item="item" @click="navigateToDetail(item.id)" />
   </div>
 </template>
 
@@ -16,6 +17,12 @@ export default {
       return this.$store.getters.dataItems;
     },
   },
+  methods: {
+    navigateToDetail(itemId) {
+      // Navigate to the DetailView with the item's ID as a route parameter
+      this.$router.push({ name: "Detail", params: { id: itemId } });
+    },
+  },
 };
 </script>
 
@@ -24,9 +31,7 @@ export default {
 .data-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  /* Responsive grid */
   gap: 20px;
-  /* Space between grid items */
   padding: 20px;
   justify-content: center;
   align-items: start;
@@ -35,19 +40,17 @@ export default {
 /* Styling for individual data cards */
 .data-card {
   background-color: #ffffff;
-  /* White background */
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  /* Subtle shadow */
   overflow: hidden;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+  /* Add pointer cursor for clickable cards */
 }
 
 .data-card:hover {
   transform: scale(1.05);
-  /* Slight zoom on hover */
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  /* Darker shadow on hover */
 }
 
 /* Thumbnail styling */

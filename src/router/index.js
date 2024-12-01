@@ -12,6 +12,12 @@ const routes = [
   { path: "/", name: "Home", component: HomeView },
   { path: "/about", name: "About", component: AboutView },
   { path: "/features", name: "Features", component: FeaturesView },
+  {
+    path: "/detail/:id",
+    name: "Detail",
+    component: () => import("@/views/DetailView.vue"),
+    props: true, // Pass route params as props
+  },
 ];
 
 const router = createRouter({
