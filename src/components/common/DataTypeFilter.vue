@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: "TypeFilter",
+  name: "DataTypeFilter",
   data() {
     return {
       selectedType: "all",

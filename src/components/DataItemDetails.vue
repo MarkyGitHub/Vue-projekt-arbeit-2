@@ -12,11 +12,11 @@
 </template>
 
 <script>
-import TextRenderer from "./TextRenderer.vue";
-import ImageRenderer from "./ImageRenderer.vue";
-import VideoRenderer from "./VideoRenderer.vue";
-import NumericalRenderer from "./NumericalRenderer.vue";
-import AIRenderer from "./AIRenderer.vue";
+import TextRenderer from "./layout/TextRenderer.vue";
+import ImageRenderer from "./layout/ImageRenderer.vue";
+import VideoRenderer from "./layout/VideoRenderer.vue";
+import NumericalRenderer from "./layout/NumericalRenderer.vue";
+import AIRenderer from "./layout/AIRenderer.vue";
 
 export default {
   props: {

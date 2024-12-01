@@ -4,29 +4,21 @@
     <main>
       <router-view />
       <!-- Displays the active view -->
+      <div></div>
     </main>
-    <Footer />
-  </div>
-  <div>
-    <HeaderMenu />
-    <DetailComponent />
     <AppFooter />
-    <MainIndex />
   </div>
 </template>
 
 <script>
-import DetailComponent from "@/components/DetailComponent.vue";
-import AppFooter from "@/components/AppFooter.vue";
-import MainIndex from "@/components/MainIndex.vue";
-import HeaderMenu from "@/components/HeaderMenu.vue";
+import AppFooter from "@/components/layout/AppFooter.vue";
+import HeaderMenu from "@/components/layout/HeaderMenu.vue";
 
 export default {
   components: {
     HeaderMenu,
-    DetailComponent,
+
     AppFooter,
-    MainIndex,
   },
 };
 </script>
@@ -40,7 +32,8 @@ export default {
 }
 
 main {
-  flex: 1; /* Fills available space between header and footer */
+  flex: 1;
+  /* Fills available space between header and footer */
   padding: 20px;
 }
 </style>

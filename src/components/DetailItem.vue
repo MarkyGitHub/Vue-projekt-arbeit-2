@@ -5,7 +5,7 @@
     </header>
     <main>
       <!-- Theme auswählen -->
-      <div class="selectors">
+      <!--   <div class="selectors">
         <label for="theme-selector">Theme:</label>
         <select
           id="themeSelector"
@@ -20,8 +20,7 @@
           <option value="theme-bootstrap">Bootstrap 4</option>
           <option value="theme-wordpress">WordPress</option>
         </select>
-
-        <!-- Sprache auswählen -->
+       
         <label for="language-selector">Sprache:</label>
         <select
           id="languageSelector"
@@ -33,7 +32,7 @@
           <option value="es">Español</option>
           <option value="fr">Français</option>
         </select>
-      </div>
+      </div> -->
       <br /><br />
 
       <button id="back-to-list" @click="goBack">

@@ -129,6 +129,8 @@ const configureCORS = async () => {
     console.error("Error during app initialization:", error.message);
   }
 
+  app.config.compilerOptions.isCustomElement = (tag) => tag === "type-filter";
+
   // Mount the app
   app.use(i18n).use(router).use(store).mount("#app");
 })();
