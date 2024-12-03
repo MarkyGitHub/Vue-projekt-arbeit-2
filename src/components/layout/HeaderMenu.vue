@@ -7,38 +7,24 @@
         <li><router-link to="/features">Features</router-link></li>
       </ul>
     </nav>
-    <div>
-      <ThemeSelector @update-theme="updateTheme" />
-      <LanguageSelector @update-language="updateLanguage" />
-      <TypeFilter @filter-type="filterByType" />
-      <SearchField @search-query="searchByTitle" />
-      <SortButton @sort-items="sortItems" />
+    <div class="selector">
+      <!-- Theme Selector -->
+      <ThemeSelector />
+
+      <!-- Language Selector -->
+      <LanguageSelector />
     </div>
   </header>
 </template>
 
 <script>
-
 import ThemeSelector from "@/components/common/ThemeSelector.vue";
 import LanguageSelector from "@/components/common/LanguageSelector.vue";
-import DataTypeFilter from "@/components/common/DataTypeFilter.vue";
-import SearchField from "@/components/common/SearchField.vue";
-import SortButton from "@/components/common/SortButton.vue";
-
 export default {
   name: "HeaderMenu",
   components: {
     ThemeSelector,
     LanguageSelector,
-    DataTypeFilter,
-    SearchField,
-    SortButton,
-  },
-  data() {
-    return {
-      items: [], // All data items
-      filteredItems: [],
-    };
   },
   methods: {
     updateTheme(theme) {
@@ -47,18 +33,8 @@ export default {
     updateLanguage(language) {
       console.log("Language updated:", language);
     },
-    filterByType(type) {
-      console.log("Filter by type:", type);
-    },
-    searchByTitle(query) {
-      console.log("Search query:", query);
-    },
-    sortItems(sortState) {
-      console.log("Sort state:", sortState);
-    },
   },
 };
-
 </script>
 
 <style scoped>
@@ -88,5 +64,11 @@ nav ul li a {
 nav ul li a.router-link-exact-active {
   font-weight: bold;
   text-decoration: underline;
+}
+
+.selectors {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 </style>

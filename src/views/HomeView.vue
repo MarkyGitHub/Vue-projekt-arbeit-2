@@ -1,16 +1,31 @@
 <template>
   <div>
-    <!-- Conditional rendering based on the selected item -->
+    <!-- Render container for the selected item -->
     <div v-if="selectedItem" id="render-container">
       <button @click="backToGrid">Back</button>
+      <button @click="editItem">Edit</button>
+
       <!-- Render the appropriate component for the selected item -->
-      <component
-        :is="getRenderer(selectedItem.type)"
-        :data-item="selectedItem"
-      />
+      <div v-if="!isEditing">
+        <component
+          :is="getRenderer(selectedItem.type)"
+          :data-item="selectedItem"
+        />
+      </div>
+
+      <!-- Edit mode: show editable fields -->
+      <div v-else>
+        <component
+          :is="getEditor(selectedItem.type)"
+          :data-item="selectedItem"
+          @save="saveItem"
+        />
+      </div>
     </div>
+
+    <!-- Grid container for data items -->
     <div v-else id="data-cards-container" class="data-grid">
-      <!-- Grid view for data items -->
+      <DataItemMenuBar />
       <DataItemCard
         v-for="item in dataItems"
         :key="item.id"
@@ -30,6 +45,14 @@ import ImageRenderer from "@/components/layout/ImageRenderer.vue";
 import VideoRenderer from "@/components/layout/VideoRenderer.vue";
 import NumericalRenderer from "@/components/layout/NumericalRenderer.vue";
 import AIRenderer from "@/components/layout/AIRenderer.vue";
+import TextEditor from "@/components/edit/TextEditor.vue";
+import ImageEditor from "@/components/edit/ImageEditor.vue";
+import VideoEditor from "@/components/edit/VideoEditor.vue";
+import NumericalEditor from "@/components/edit/NumericalEditor.vue";
+import AIEditor from "@/components/edit/AIEditor.vue";
+import couchdbUtils from "@/db/couchdbUtils";
+//DatGrid header bar
+import DataItemMenuBar from "@/components/layout/DataItemMenuBar.vue";
 
 export default {
   components: {
@@ -39,22 +62,47 @@ export default {
     VideoRenderer,
     NumericalRenderer,
     AIRenderer,
+    TextEditor,
+    ImageEditor,
+    VideoEditor,
+    NumericalEditor,
+    AIEditor,
+    DataItemMenuBar,
   },
   setup() {
     const store = useStore();
     const selectedItem = ref(null);
+    const isEditing = ref(false);
 
     // Access data items from Vuex
     const dataItems = computed(() => store.getters.dataItems);
 
     // Set the selected item when a card is clicked
     const selectItem = (item) => {
-      selectedItem.value = item;
+      selectedItem.value = { ...item }; // Clone to avoid mutating directly
+      isEditing.value = false;
     };
 
     // Navigate back to the grid
     const backToGrid = () => {
       selectedItem.value = null;
+    };
+
+    // Enable edit mode
+    const editItem = () => {
+      isEditing.value = true;
+    };
+
+    // Save the edited item
+    const saveItem = async (editedItem) => {
+      try {
+        await couchdbUtils.insertDocument(editedItem); // Save to CouchDB
+        store.dispatch("fetchDataItems"); // Refresh Vuex store
+        isEditing.value = false; // Exit edit mode
+        console.log("Item saved successfully!");
+      } catch (error) {
+        console.error("Error saving item:", error.message);
+      }
     };
 
     // Map data types to render components
@@ -69,12 +117,28 @@ export default {
       return rendererMap[type] || "div"; // Default to 'div' if no match
     };
 
+    // Map data types to editor components
+    const getEditor = (type) => {
+      const editorMap = {
+        text: "TextEditor",
+        image: "ImageEditor",
+        video: "VideoEditor",
+        numerical: "NumericalEditor",
+        ai_result: "AIEditor",
+      };
+      return editorMap[type] || "div"; // Default to 'div' if no match
+    };
+
     return {
       dataItems,
       selectedItem,
+      isEditing,
       selectItem,
       backToGrid,
+      editItem,
+      saveItem,
       getRenderer,
+      getEditor,
     };
   },
 };
