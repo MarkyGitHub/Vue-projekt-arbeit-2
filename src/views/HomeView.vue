@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- Header bar for DataItemMenuBar -->
+    <div class="header-bar">
+      <DataItemMenuBar />
+    </div>
+
     <!-- Render container for the selected item -->
     <div v-if="selectedItem" id="render-container">
       <button @click="backToGrid">Back</button>
@@ -25,7 +30,6 @@
 
     <!-- Grid container for data items -->
     <div v-else id="data-cards-container" class="data-grid">
-      <DataItemMenuBar />
       <DataItemCard
         v-for="item in dataItems"
         :key="item.id"
@@ -51,7 +55,6 @@ import VideoEditor from "@/components/edit/VideoEditor.vue";
 import NumericalEditor from "@/components/edit/NumericalEditor.vue";
 import AIEditor from "@/components/edit/AIEditor.vue";
 import couchdbUtils from "@/db/couchdbUtils";
-//DatGrid header bar
 import DataItemMenuBar from "@/components/layout/DataItemMenuBar.vue";
 
 export default {
@@ -161,6 +164,14 @@ export default {
   border-radius: 8px;
 }
 
+/* Styles for the header bar */
+.header-bar {
+  padding: 10px 20px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Styles for buttons */
 button {
   margin-bottom: 20px;
   padding: 10px 15px;
