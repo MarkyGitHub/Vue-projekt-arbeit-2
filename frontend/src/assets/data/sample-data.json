@@ -168,9 +168,9 @@
       "description": "Objekterkennungsergebnisse mit identifizierten Objekten in Bildern",
       "modelType": "object_detection",
       "results": [
-        { "object": "person", "confidence": 0.97 },
-        { "object": "auto", "confidence": 0.88 },
-        { "object": "fahrrad", "confidence": 0.92 }
+        { "object": "person", "confidence": 0.97, "category": "human" },
+        { "object": "auto", "confidence": 0.88, "category": "automobile" },
+        { "object": "fahrrad", "confidence": 0.92, "category": "transportation" }
       ],
       "sourceUrl": "https://example.com/models/object-detection",
       "thumbnail": "https://picsum.photos/id/1026/300/200"

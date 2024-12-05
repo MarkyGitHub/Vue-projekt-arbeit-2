@@ -1,6 +1,10 @@
 <template>
-  <div>
+  <div class="numerical-renderer">
     <canvas ref="chartCanvas"></canvas>
+    <p v-if="dataItem.sourceUrl" class="source">
+      <strong>Source:</strong> <a :href="dataItem.sourceUrl" target="_blank">{{ dataItem.sourceUrl }}</a>
+    </p>
+    <p class="description">{{ dataItem.description }}</p>
   </div>
 </template>
 
@@ -128,8 +132,36 @@ export default {
 </script>
 
 <style scoped>
+.numerical-renderer {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 canvas {
   max-width: 100%;
   height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: white;
+}
+
+.source {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: left;
+  word-wrap: break-word;
+}
+
+.description {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  text-align: left;
 }
 </style>

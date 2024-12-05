@@ -1,15 +1,17 @@
 <template>
     <div class="data-item-menu-bar">
-        <div class="data-tye-selectors">
-            <!-- Data Type Filter -->
+        <!-- Data Type Filter -->
+        <div class="filter-section">
             <DataTypeFilter @filter-type="filterByType" />
         </div>
 
-        <div class="actions">
-            <!-- Search Field -->
+        <!-- Search Field -->
+        <div class="search-section">
             <SearchField @search-query="searchByTitle" />
+        </div>
 
-            <!-- Sort Button -->
+        <!-- Sort Button -->
+        <div class="sort-section">
             <SortButton @sort-items="sortItems" />
         </div>
     </div>
@@ -40,3 +42,37 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.data-item-menu-bar {
+    display: flex;
+    justify-content: space-between;
+    /* Space between sections */
+    align-items: center;
+    /* Vertically center components */
+    gap: 20px;
+    /* Spacing between components */
+    background-color: #f5f5f5;
+    /* Light gray background for visibility */
+    padding: 10px 20px;
+    /* Add padding for spacing */
+    border-bottom: 1px solid #ddd;
+    /* Separate visually from the grid */
+}
+
+.filter-section,
+.search-section,
+.sort-section {
+    display: flex;
+    align-items: center;
+}
+
+.search-section {
+    flex-grow: 1;
+    /* Allow search field to expand */
+}
+
+.sort-section {
+    justify-content: flex-end;
+}
+</style>

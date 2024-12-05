@@ -9,9 +9,13 @@ export default defineConfig({
   devServer: {
     proxy: {
       "/project_arbeit_2db": {
-        target: "http://127.0.0.1:5984",
+        target: "http://127.0.0.1:5984", // CouchDB server
         changeOrigin: true,
         pathRewrite: { "^/project_arbeit_2db": "/project_arbeit_2db" },
+      },
+      "/uploadImage": {
+        target: "http://localhost:3000", // Backend server
+        changeOrigin: true,
       },
     },
   },

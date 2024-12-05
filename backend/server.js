@@ -1,40 +1,67 @@
 import express from "express";
+import { formidable } from "formidable"; // Updated import
 import path from "path";
-import formidable from "formidable";
 import fs from "fs";
 
-const server = express();
+// Define upload directory
 const __dirname = path.resolve();
 const uploadDir = path.join(__dirname, "uploads");
-
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// Serve Vue build files
-const staticPath = path.join(__dirname, "frontend", "dist");
-server.use(express.static(staticPath));
+const server = express();
 
-// File upload endpoint
+// Enable CORS for cross-origin requests
+server.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // Vue app's origin
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// Serve static files
+server.use("/uploads", express.static(uploadDir));
+
+// File upload route
 server.post("/uploadImage", (req, res) => {
-  const form = formidable({ uploadDir, keepExtensions: true });
+  const form = formidable({
+    uploadDir,
+    keepExtensions: true,
+  });
 
   form.parse(req, (err, fields, files) => {
     if (err) {
-      res.status(500).send("Error uploading file");
-      return;
+      console.error("Formidable error:", err);
+      return res.status(500).json({ error: "File upload failed" });
     }
-    const uploadedFile = files.image;
-    const fileUrl = `/uploads/${uploadedFile.newFilename}`;
-    res.json({ fileUrl });
+
+    console.log("Parsed fields:", fields);
+    console.log("Parsed files:", files);
+
+    // Check if 'image' field exists and handle the array
+    const uploadedFile = Array.isArray(files.image)
+      ? files.image[0]
+      : files.image;
+
+    if (!uploadedFile || !uploadedFile.filepath) {
+      console.error("No valid file uploaded");
+      return res.status(400).json({ error: "File was not uploaded correctly" });
+    }
+
+    const filePath = uploadedFile.filepath;
+    const fileName = path.basename(filePath);
+    const fileUrl = `http://localhost:3000/uploads/${fileName}`;
+
+    res.status(200).json({ fileUrl });
   });
 });
 
-// Fallback to Vue app for unmatched routes
-server.get("*", (req, res) => {
-  res.sendFile(path.join(staticPath, "index.html"));
-});
-
+// Start the server
 server.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+  console.log("Server is running on http://localhost:3000");
 });

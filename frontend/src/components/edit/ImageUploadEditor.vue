@@ -1,8 +1,6 @@
 <template>
-    <div>
-        <label>Image Source:</label>
-        <div>
-            <!-- Toggle between URL and File Upload -->
+    <div class="image-upload-container">
+        <div class="radio-group">
             <label>
                 <input type="radio" value="url" v-model="inputType" />
                 Image URL
@@ -14,23 +12,20 @@
         </div>
 
         <!-- URL Input -->
-        <div v-if="inputType === 'url'">
-            <label>Enter Image URL:</label>
-            <input v-model="imageUrl" placeholder="Enter image URL here" />
+        <div v-if="inputType === 'url'" class="form-group">
+            <label for="image-url">Enter Image URL:</label>
+            <input id="image-url" v-model="imageUrl" placeholder="Enter image URL here" />
         </div>
 
         <!-- File Upload -->
-        <div v-else>
-            <label>Upload Image:</label>
-            <input type="file" @change="handleFileUpload" accept="image/*" />
-            <div v-if="preview">
+        <div v-else class="form-group">
+            <label for="file-upload">Upload Image:</label>
+            <input id="file-upload" type="file" @change="handleFileUpload" accept="image/*" />
+            <div v-if="preview" class="preview-container">
                 <p>Preview:</p>
-                <img :src="preview" alt="Uploaded Image Preview" style="max-width: 100%; height: auto;" />
+                <img :src="preview" alt="Uploaded Image Preview" />
             </div>
         </div>
-
-        <!-- Conditional Save Button -->
-        <button v-if="showSaveButton" @click="saveImageSource">Save</button>
     </div>
 </template>
 
@@ -45,29 +40,39 @@ export default {
         },
         showSaveButton: {
             type: Boolean,
-            default: true, // Show Save button by default
+            default: true,
         },
     },
     data() {
         return {
-            inputType: "url", // Default to "Image URL" option
-            imageUrl: this.initialUrl, // Start with the passed-in URL
-            preview: null, // For previewing uploaded images
+            inputType: "url",
+            imageUrl: this.initialUrl,
+            preview: null,
         };
     },
     methods: {
-        saveImageSource() {
-            // Emit the image source (URL or uploaded file)
-            this.$emit("update-image-url", this.imageUrl || this.preview);
-        },
-        handleFileUpload(event) {
+        async handleFileUpload(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.preview = e.target.result; // Save base64 preview
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const response = await fetch("http://localhost:3000/uploadImage", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                this.preview = data.fileUrl;
+                this.$emit("update-image-url", data.fileUrl);
+            } catch (error) {
+                console.error("Error uploading file:", error);
             }
         },
     },
@@ -75,9 +80,32 @@ export default {
 </script>
 
 <style scoped>
-img {
-    max-width: 100%;
-    height: auto;
+.image-upload-container {
+    margin-top: 20px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="file"] {
     margin-top: 10px;
+}
+
+.preview-container img {
+    max-width: 100%;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 </style>

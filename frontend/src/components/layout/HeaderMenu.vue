@@ -1,13 +1,13 @@
 <template>
   <header>
-    <nav>
+    <nav class="menu">
       <ul>
         <li><router-link to="/">Home</router-link></li>
         <li><router-link to="/about">About</router-link></li>
         <li><router-link to="/features">Features</router-link></li>
       </ul>
     </nav>
-    <div class="selector">
+    <div class="selectors">
       <!-- Theme Selector -->
       <ThemeSelector />
 
@@ -39,12 +39,16 @@ export default {
 
 <style scoped>
 header {
+  display: flex;
+  justify-content: space-between;
+  /* Menu on left, selectors on right */
+  align-items: center;
   background-color: #333;
   color: white;
   padding: 10px 20px;
 }
 
-nav ul {
+.menu ul {
   list-style: none;
   display: flex;
   gap: 15px;
@@ -52,16 +56,17 @@ nav ul {
   padding: 0;
 }
 
-nav ul li {
+.menu ul li {
   display: inline;
 }
 
-nav ul li a {
+.menu ul li a {
   color: white;
   text-decoration: none;
+  font-size: 16px;
 }
 
-nav ul li a.router-link-exact-active {
+.menu ul li a.router-link-exact-active {
   font-weight: bold;
   text-decoration: underline;
 }
@@ -69,6 +74,14 @@ nav ul li a.router-link-exact-active {
 .selectors {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+}
+
+select {
+  background-color: #555;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 5px;
 }
 </style>
