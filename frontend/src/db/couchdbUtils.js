@@ -4,6 +4,7 @@
  * CouchDB Client for interacting with a CouchDB database - couchdbUtils.js
  */
 import { localDB, remoteDB, syncDatabases } from "@/db/pouchdbClient";
+import couchDBCredentials from "@/config/couchDBCredentials";
 
 const couchdbUtils = {
   /**
@@ -41,15 +42,24 @@ const couchdbUtils = {
    * Insert or update a document into the local database
    * @param {Object} doc - The document to insert or update
    */
-  insertDocument: async (doc) => {
+  insertDocument: async (document) => {
     try {
-      const existingDoc = await localDB.get(doc._id).catch(() => null); // Check if the document exists
-      if (existingDoc) {
-        doc._rev = existingDoc._rev; // Add revision for updates
+      const response = await fetch(`${remoteDB.name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(
+            `${couchDBCredentials.username}:${couchDBCredentials.password}`
+          )}`,
+        },
+        body: JSON.stringify(document),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      const response = await localDB.put(doc); // Insert or update the document
-      console.log("Document inserted/updated:", response);
-      return response;
+
+      return await response.json();
     } catch (error) {
       console.error("Error inserting/updating document:", error.message);
       throw error;

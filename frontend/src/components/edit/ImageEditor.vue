@@ -30,8 +30,7 @@
     </div>
 
     <!-- Image Upload Editor -->
-    <ImageUploadEditor :initial-url="editableItem.thumbnail" @update-image-url="updateImageUrl"
-      :showSaveButton="false" />
+    <ImageUploadEditor :initial-url="editableItem.thumbnail" @update-image-url="updateImageUrl" />
 
     <!-- Save Button -->
     <div class="form-group">
@@ -58,9 +57,9 @@ export default {
   setup(props) {
     const editableItem = ref({ ...props.dataItem }); // Clone data item for editing
 
-    // Update the thumbnail URL in the parent component
     const updateImageUrl = (newUrl) => {
       editableItem.value.thumbnail = newUrl;
+      editableItem.value.imageUrl = newUrl; // Ensure both are updated
     };
 
     return { editableItem, updateImageUrl };

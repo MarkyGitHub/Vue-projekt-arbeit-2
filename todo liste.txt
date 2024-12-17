@@ -1,0 +1,8 @@
+Todo liste:
+Validation
+Testing
+Theme
+Language
+Multi user
+----
+arrow functions and code

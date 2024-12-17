@@ -14,17 +14,14 @@
         <!-- URL Input -->
         <div v-if="inputType === 'url'" class="form-group">
             <label for="image-url">Enter Image URL:</label>
-            <input id="image-url" v-model="imageUrl" placeholder="Enter image URL here" />
+            <input id="image-url" v-model="imageUrl" @input="emitImageUpdate(imageUrl)"
+                placeholder="Enter image URL here" />
         </div>
 
         <!-- File Upload -->
         <div v-else class="form-group">
             <label for="file-upload">Upload Image:</label>
             <input id="file-upload" type="file" @change="handleFileUpload" accept="image/*" />
-            <div v-if="preview" class="preview-container">
-                <p>Preview:</p>
-                <img :src="preview" alt="Uploaded Image Preview" />
-            </div>
         </div>
     </div>
 </template>
@@ -38,16 +35,11 @@ export default {
             required: false,
             default: "",
         },
-        showSaveButton: {
-            type: Boolean,
-            default: true,
-        },
     },
     data() {
         return {
             inputType: "url",
             imageUrl: this.initialUrl,
-            preview: null,
         };
     },
     methods: {
@@ -69,16 +61,18 @@ export default {
                 }
 
                 const data = await response.json();
-                this.preview = data.fileUrl;
-                this.$emit("update-image-url", data.fileUrl);
+                this.imageUrl = data.fileUrl;
+                this.emitImageUpdate(data.fileUrl);
             } catch (error) {
                 console.error("Error uploading file:", error);
             }
         },
+        emitImageUpdate(newUrl) {
+            this.$emit("update-image-url", newUrl);
+        },
     },
 };
 </script>
-
 <style scoped>
 .image-upload-container {
     margin-top: 20px;

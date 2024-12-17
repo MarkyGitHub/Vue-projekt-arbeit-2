@@ -44,14 +44,18 @@
       <input id="thumbnail" v-model="editableItem.thumbnail" type="url" placeholder="Enter the thumbnail URL" />
     </div>
 
-    <!-- Save Button -->
-    <button class="save-button" @click="saveItem">Save</button>
+    <!-- Save and Create Buttons -->
+    <div class="button-group">
+      <button class="save-button" @click="saveItem">Save</button>
+      <button class="create-button" @click="createNewItem">Create</button>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, watch } from "vue";
 import DataPointsEditor from "@/components/edit/DataPointsEditor.vue";
+import couchdbUtils from "@/db/couchdbUtils"; // Import CouchDB utility
 
 export default {
   name: "NumericalEditor",
@@ -67,6 +71,7 @@ export default {
   setup(props, { emit }) {
     const editableItem = ref(null);
 
+    // Watch for changes in props.dataItem and initialize editableItem
     watch(
       () => props.dataItem,
       (newDataItem) => {
@@ -75,17 +80,41 @@ export default {
       { immediate: true }
     );
 
+    // Update data points in the editable item
     const updateDataPoints = (updatedPoints) => {
       if (editableItem.value) {
         editableItem.value.dataPoints = updatedPoints;
       }
     };
 
+    // Save the current item
     const saveItem = () => {
       emit("save", editableItem.value);
     };
 
-    return { editableItem, updateDataPoints, saveItem };
+    // Create a new item
+    const createNewItem = async () => {
+      try {
+        // Generate a unique ID using a UUID generator or similar method
+        const newId = crypto.randomUUID(); // Modern browsers support this
+        const newItem = {
+          ...editableItem.value,
+          _id: newId, // Assign a unique ID
+        };
+
+        // Insert the new item into CouchDB
+        const result = await couchdbUtils.insertDocument(newItem);
+
+        console.log("New item created:", result);
+
+        // Emit a creation event with the new item
+        emit("create", newItem);
+      } catch (error) {
+        console.error("Error creating new item:", error.message);
+      }
+    };
+
+    return { editableItem, updateDataPoints, saveItem, createNewItem };
   },
 };
 </script>
@@ -123,18 +152,38 @@ textarea {
   resize: vertical;
 }
 
-.save-button {
-  display: block;
-  width: 100%;
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.save-button,
+.create-button {
+  flex: 1;
   padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.save-button {
   background-color: #42b983;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 .save-button:hover {
   background-color: #369a6e;
+}
+
+.create-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.create-button:hover {
+  background-color: #0056b3;
 }
 </style>

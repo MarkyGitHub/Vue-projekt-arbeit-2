@@ -1,6 +1,7 @@
 <template>
   <div class="numerical-renderer">
-    <canvas ref="chartCanvas"></canvas>
+    <canvas ref="chartCanvas" :key="dataItem.id"></canvas>
+
     <p v-if="dataItem.sourceUrl" class="source">
       <strong>Source:</strong> <a :href="dataItem.sourceUrl" target="_blank">{{ dataItem.sourceUrl }}</a>
     </p>
@@ -121,9 +122,13 @@ export default {
     destroyChart() {
       if (this.chartInstance) {
         this.chartInstance.destroy(); // Properly destroy the chart instance
-        this.chartInstance = null; // Reset the instance
+        this.chartInstance = null;
       }
-    },
+
+      const ctx = this.$refs.chartCanvas.getContext("2d");
+      ctx.clearRect(0, 0, this.$refs.chartCanvas.width, this.$refs.chartCanvas.height); // Clear the canvas
+    }
+
   },
   beforeUnmount() {
     this.destroyChart(); // Clean up the chart instance

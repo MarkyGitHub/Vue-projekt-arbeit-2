@@ -7,8 +7,11 @@
 
     <!-- Render container for the selected item -->
     <div v-if="selectedItem" id="render-container">
-      <button @click="backToGrid">Back</button>
-      <button @click="editItem">Edit</button>
+      <!-- Back and Edit Buttons -->
+      <div class="top-navigation">
+        <button class="back-button" @click="backToGrid">Back</button>
+        <button class="edit-button" @click="editItem">Edit</button>
+      </div>
 
       <!-- Render the appropriate component for the selected item -->
       <div v-if="!isEditing">
@@ -18,6 +21,12 @@
       <!-- Edit mode: show editable fields -->
       <div v-else>
         <component :is="getEditor(selectedItem.type)" :data-item="selectedItem" @save="saveItem" />
+      </div>
+
+      <!-- Next and Previous Buttons -->
+      <div class="bottom-navigation">
+        <button class="prev-button" @click="goToPreviousItem">Previous</button>
+        <button class="next-button" @click="goToNextItem">Next</button>
       </div>
     </div>
 
@@ -67,91 +76,65 @@ export default {
     const filterType = ref("all");
     const searchQuery = ref("");
     const sortState = ref("asc");
+    const currentIndex = ref(0);
 
     // Access data items from Vuex
     const dataItems = computed(() => store.getters.dataItems);
 
-    // Apply filters, search, and sort to data items
+    // Filtered and sorted data items
     const filteredDataItems = computed(() => {
       let items = dataItems.value;
-
-      // Filter by type
-      if (filterType.value !== "all") {
-        items = items.filter((item) => item.type === filterType.value);
-      }
-
-      // Search by title
+      if (filterType.value !== "all") items = items.filter((item) => item.type === filterType.value);
       if (searchQuery.value.trim()) {
         items = items.filter((item) =>
           item.title.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
       }
-
-      // Sort items
-      items.sort((a, b) => {
-        if (sortState.value === "asc") {
-          return a.title.localeCompare(b.title);
-        } else {
-          return b.title.localeCompare(a.title);
-        }
-      });
-
+      items.sort((a, b) =>
+        sortState.value === "asc" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+      );
       return items;
     });
 
-    // Event handlers for filtering, searching, and sorting
-    const applyFilter = (type) => {
-      filterType.value = type;
-    };
-
-    const applySearch = (query) => {
-      searchQuery.value = query;
-    };
-
-    const applySort = (state) => {
-      sortState.value = state;
-    };
-
-    // Set the selected item when a card is clicked
     const selectItem = (item) => {
-      selectedItem.value = { ...item }; // Clone to avoid mutating directly
+      currentIndex.value = dataItems.value.findIndex((i) => i.id === item.id);
+      selectedItem.value = { ...item };
       isEditing.value = false;
     };
 
-    // Navigate back to the grid
     const backToGrid = () => {
       selectedItem.value = null;
     };
 
-    // Enable edit mode
     const editItem = () => {
       isEditing.value = true;
     };
 
-    // Save the edited item
-    // Save the edited item
     const saveItem = async (editedItem) => {
       try {
-        // Save the edited item to CouchDB
         await couchdbUtils.insertDocument(editedItem);
-
-        // Find the index of the item in Vuex state and update it
-        const index = dataItems.value.findIndex((item) => item._id === editedItem._id); // Match CouchDB's `_id`
+        const index = dataItems.value.findIndex((item) => item._id === editedItem._id);
         if (index !== -1) {
           store.commit("updateDataItem", { index, updatedItem: editedItem });
         }
-
-        // Reset editing state
         isEditing.value = false;
         selectedItem.value = null;
-
-        console.log("Item saved successfully!");
       } catch (error) {
         console.error("Error saving item:", error.message);
       }
     };
 
-    // Map data types to render components
+    const goToNextItem = () => {
+      currentIndex.value = (currentIndex.value + 1) % filteredDataItems.value.length;
+      selectedItem.value = filteredDataItems.value[currentIndex.value];
+    };
+
+    const goToPreviousItem = () => {
+      currentIndex.value =
+        (currentIndex.value - 1 + filteredDataItems.value.length) % filteredDataItems.value.length;
+      selectedItem.value = filteredDataItems.value[currentIndex.value];
+    };
+
     const getRenderer = (type) => {
       const rendererMap = {
         text: "TextRenderer",
@@ -160,10 +143,9 @@ export default {
         numerical: "NumericalRenderer",
         ai_result: "AIRenderer",
       };
-      return rendererMap[type] || "div"; // Default to 'div' if no match
+      return rendererMap[type] || "div";
     };
 
-    // Map data types to editor components
     const getEditor = (type) => {
       const editorMap = {
         text: "TextEditor",
@@ -172,7 +154,7 @@ export default {
         numerical: "NumericalEditor",
         ai_result: "AIEditor",
       };
-      return editorMap[type] || "div"; // Default to 'div' if no match
+      return editorMap[type] || "div";
     };
 
     return {
@@ -180,13 +162,16 @@ export default {
       filteredDataItems,
       selectedItem,
       isEditing,
-      applyFilter,
-      applySearch,
-      applySort,
+      currentIndex,
+      applyFilter: (type) => (filterType.value = type),
+      applySearch: (query) => (searchQuery.value = query),
+      applySort: (state) => (sortState.value = state),
       selectItem,
       backToGrid,
       editItem,
       saveItem,
+      goToNextItem,
+      goToPreviousItem,
       getRenderer,
       getEditor,
     };
@@ -195,36 +180,40 @@ export default {
 </script>
 
 <style scoped>
-/* Styles for the grid view */
-.data-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
-
-/* Styles for the render container */
-#render-container {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-/* Styles for the header bar */
 .header-bar {
   padding: 10px 20px;
   background-color: #f5f5f5;
   border-bottom: 1px solid #ddd;
 }
 
-/* Styles for buttons */
+#render-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.top-navigation {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.bottom-navigation {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
 button {
-  margin-bottom: 20px;
   padding: 10px 15px;
   font-size: 1rem;
   background-color: #42b983;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -232,5 +221,12 @@ button {
 
 button:hover {
   background-color: #369a6e;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 </style>

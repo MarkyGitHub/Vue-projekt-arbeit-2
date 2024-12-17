@@ -39,12 +39,16 @@
     </div>
 
     <!-- Save Button -->
-    <button class="save-button" @click="$emit('save', editableItem)">Save</button>
+    <div class="button-group">
+      <button class="save-button" @click="$emit('save', editableItem)">Save</button>
+      <button class="create-button" @click="createNewItem">Create</button>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
+import couchdbUtils from "@/db/couchdbUtils"; // Import CouchDB utility
 
 export default {
   name: "TextEditor",
@@ -54,9 +58,30 @@ export default {
       required: true,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const editableItem = ref({ ...props.dataItem }); // Clone data item for editing
-    return { editableItem };
+    // Create a new item
+    const createNewItem = async () => {
+      try {
+        // Generate a unique ID using a UUID generator or similar method
+        const newId = crypto.randomUUID(); // Modern browsers support this
+        const newItem = {
+          ...editableItem.value,
+          _id: newId, // Assign a unique ID
+        };
+
+        // Insert the new item into CouchDB
+        const result = await couchdbUtils.insertDocument(newItem);
+
+        console.log("New item created:", result);
+
+        // Emit a creation event with the new item
+        emit("create", newItem);
+      } catch (error) {
+        console.error("Error creating new item:", error.message);
+      }
+    };
+    return { editableItem, createNewItem };
   },
 };
 </script>
@@ -101,25 +126,38 @@ textarea {
   height: 100px;
 }
 
-.save-button {
-  display: block;
-  width: 100%;
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.save-button,
+.create-button {
+  flex: 1;
   padding: 10px 15px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  text-align: center;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.save-button {
+  background-color: #42b983;
+  color: white;
 }
 
 .save-button:hover {
   background-color: #369a6e;
 }
 
-.save-button:active {
-  background-color: #2b8355;
+.create-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.create-button:hover {
+  background-color: #0056b3;
 }
 </style>
